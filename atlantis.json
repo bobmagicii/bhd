@@ -1,0 +1,36 @@
+{
+	"Dirs": [
+		{
+			"Comment": "Public web mount point for managed content.",
+			"Path": "www\/data",
+			"Mode": "0o777"
+		},
+		{
+			"Comment": "Public web mount point for managed resources.",
+			"Path": "www\/share",
+			"Mode": "0o777"
+		},
+		{
+			"Comment": "Public web mount point for managed themes.",
+			"Path": "www\/themes",
+			"Mode": "0o777"
+		}
+	],
+	"Symlinks": [
+		{
+			"Path": "www\/share\/atlantis",
+			"Source": "vendor\/netherphp\/atlantis\/app\/www\/share\/atlantis",
+			"Mode": "0o777"
+		},
+		{
+			"Path": "www\/share\/nui",
+			"Source": "vendor\/netherphp\/atlantis\/app\/www\/share\/nui",
+			"Mode": "0o777"
+		},
+		{
+			"Path": "www\/themes\/default",
+			"Source": "vendor\/netherphp\/atlantis\/app\/www\/themes\/default",
+			"Mode": "0o777"
+		}
+	]
+}

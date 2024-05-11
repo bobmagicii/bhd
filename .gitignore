@@ -1,0 +1,21 @@
+# typical project wide annoyances.
+
+/.phpunit.cache
+/.DS_Store
+
+/env.lock
+/logs
+/temp
+/vendor
+/www/.well-known
+/www/share/atlantis
+/www/share/nui
+/www/themes/default
+/www/themes/soon
+
+# where db config gets stored.
+/conf/env/dev/atlantis.json
+
+# where backups get stored
+/data
+/www/data

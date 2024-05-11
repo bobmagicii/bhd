@@ -1,0 +1,264 @@
+#!env php
+<?php
+
+define('AppRoot', dirname(__FILE__, 2));
+require(sprintf('%s/vendor/autoload.php', AppRoot));
+
+use Nether\Atlantis;
+use Nether\Common;
+use Nether\Console;
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#[Console\Meta\Application('BHD', '0.0.1')]
+class App
+extends Atlantis\TerminalApp {
+
+	#[Console\Meta\Command('new')]
+	#[Console\Meta\Info('Create a backup project.')]
+	#[Console\Meta\Arg('name', 'Name of the project to create.')]
+	#[Console\Meta\Value('--type', '"datetime" or "single" (Default: datetime)')]
+	#[Console\Meta\Error(1, 'Name must be specified.')]
+	public function
+	HandleProjectNew():
+	int {
+
+		$Name = $this->GetInput(1);
+		$Type = Common\Filters\Misc::OneOfTheseFirst(
+			$this->GetOption('type'),
+			Local\Project::Types
+		);
+
+		if(!$Name)
+		$this->Quit(1);
+
+		////////
+
+		$Filename = $this->App->FromProjectRoot(Common\Filesystem\Util::Pathify(
+			'data', 'projects', "{$Name}.json"
+		));
+
+		////////
+
+		$Project = new Local\Project([
+			'Filename' => $Filename,
+			'Type'     => $Type
+		]);
+
+		$Project->Write();
+
+		return 0;
+	}
+
+	#[Console\Meta\Command('dir')]
+	#[Console\Meta\Info('Add a local or remote directory to back up over here.')]
+	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
+	#[Console\Meta\Arg('path', 'Path to backup')]
+	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
+	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	public function
+	HandleProjectDir():
+	int {
+
+		$ProjectName = $this->GetInput(1);
+		$Path = $this->GetInput(2);
+		$OptDelete = $this->GetOption('del');
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = Local\Project::FromFile($Filename);
+
+		////////
+
+		$Exists = (
+			($Project->Dirs)
+			->Distill(fn(Local\ProjectDir $D)=> $D->Path === $Path)
+			->IsNotEmpty()
+		);
+
+		////////
+
+		if($OptDelete) {
+			$this->PrintStatus("Removing {$Path} from {$ProjectName}");
+
+			if($Exists)
+			$Project->Dirs->Filter(fn(Local\ProjectDir $D)=> $D->Path !== $Path);
+		}
+
+		else {
+			$this->PrintStatus("Adding {$Path} to {$ProjectName}");
+
+			if(!$Exists)
+			$Project->Dirs->Push(Local\ProjectDir::New($Path));
+		}
+
+		$Project->Write();
+
+		return 0;
+	}
+
+	#[Console\Meta\Command('repo')]
+	#[Console\Meta\Info('Add a Git repository to back up over here.')]
+	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
+	#[Console\Meta\Arg('repo-url', 'Path to backup')]
+	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
+	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	public function
+	HandleProjectRepo():
+	int {
+
+		$ProjectName = $this->GetInput(1);
+		$Path = $this->GetInput(2);
+		$OptDelete = $this->GetOption('del');
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = Local\Project::FromFile($Filename);
+
+		////////
+
+		$Exists = (
+			($Project->Repos)
+			->Distill(fn(Local\ProjectRepo $D)=> $D->Path === $Path)
+			->IsNotEmpty()
+		);
+
+		////////
+
+		if($OptDelete) {
+			$this->PrintStatus("Removing {$Path} from {$ProjectName}");
+
+			if($Exists)
+			$Project->Repos->Filter(fn(Local\ProjectRepo $D)=> $D->Path !== $Path);
+		}
+
+		else {
+			$this->PrintStatus("Adding {$Path} to {$ProjectName}");
+
+			if(!$Exists)
+			$Project->Repos->Push(Local\ProjectRepo::New($Path));
+		}
+
+		$Project->Write();
+
+		return 0;
+	}
+
+	#[Console\Meta\Command('db')]
+	#[Console\Meta\Info('Add a project.atl configured DB to backup over here.')]
+	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
+	#[Console\Meta\Arg('db', 'DB to backup.')]
+	#[Console\Meta\Value('--tunnel', 'Host to shell into first.')]
+	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
+	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	public function
+	HandleProjectDatabase():
+	int {
+
+		$ProjectName = $this->GetInput(1);
+		$Alias = $this->GetInput(2);
+		$OptDelete = $this->GetOption('del');
+		$OptTunnelHost = $this->GetOption('tunnel');
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = Local\Project::FromFile($Filename);
+
+		////////
+
+		$Exists = (
+			($Project->Databases)
+			->Distill(fn(Local\ProjectDatabase $D)=> $D->Alias === $Alias)
+			->IsNotEmpty()
+		);
+
+		////////
+
+		if($OptDelete) {
+			$this->PrintStatus("Removing {$Alias} from {$ProjectName}");
+
+			if($Exists)
+			$Project->Databases->Filter(fn(Local\ProjectDatabase $D)=> $D->Alias !== $Alias);
+		}
+
+		else {
+			$this->PrintStatus("Adding {$Alias} to {$ProjectName}");
+
+			if(!$Exists)
+			$Project->Databases->Push(Local\ProjectDatabase::New(
+				Alias: $Alias,
+				TunnelHost: $OptTunnelHost
+			));
+		}
+
+		$Project->Write();
+
+		return 0;
+	}
+
+	#[Console\Meta\Command('run')]
+	#[Console\Meta\Info('Perform project backup routine now.')]
+	#[Console\Meta\Arg('project', 'Name of the project to run.')]
+	public function
+	HandleProjectRun():
+	int {
+
+		$Now = new Common\Date;
+		$Name = $this->GetInput(1);
+		$File = $this->GetPathToProject($Name);
+		$Dest = $this->GetPathToStorage($Name);
+		$Project = Local\Project::FromFile($File);
+		$Commands = $Project->Run($Dest);
+
+		$CLI = NULL;
+		$Key = NULL;
+		$Cmd = NULL;
+
+		$this->PrintAppHeader(sprintf(
+			'Running Backup "%s"',
+			$Name
+		));
+
+		foreach($Commands as $Key => $Cmd) {
+			$this->PrintStatus("Running {$Key}...");
+			$this->PrintLn($Cmd, 2);
+
+			$CLI = new Console\Struct\CommandLineUtil($Cmd);
+			$CLI->Run();
+		}
+
+		$Project->UpdateLastRun($Now);
+		$Project->Write();
+
+		return 0;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	protected function
+	GetPathToProject(string $ProjectName):
+	string {
+
+		$Filename = $this->App->FromProjectRoot(Common\Filesystem\Util::Pathify(
+			'data', 'projects', "{$ProjectName}.json"
+		));
+
+		return $Filename;
+	}
+
+	protected function
+	GetPathToStorage(string $ProjectName):
+	string {
+
+		$Filename = $this->App->FromProjectRoot(Common\Filesystem\Util::Pathify(
+			'data', 'backups', $ProjectName
+		));
+
+		return $Filename;
+	}
+
+};
+
+exit(App::Realboot([
+	'AppRoot' => AppRoot
+]));
+

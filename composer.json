@@ -1,0 +1,30 @@
+{
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"config": {
+		"preferred-install": {
+			"netherphp/*": "source",
+			"*": "dist"
+		},
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"netherphp/composer-plugin": true
+		}
+	},
+	"require": {
+		"netherphp/atlantis": "dev-master",
+		"netherphp/common": "dev-master as 5.0.99"
+	},
+	"require-dev": {
+		"netherphp/standards": "^0.2.9",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+	},
+	"autoload": {
+		"psr-0": {
+			"Local\\": "core"
+		},
+		"psr-4": {
+			"Routes\\": "routes"
+		}
+	}
+}
