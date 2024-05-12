@@ -1,7 +1,7 @@
 # typical project wide annoyances.
 
 /.phpunit.cache
-/.DS_Store
+/**/.DS_Store
 
 /env.lock
 /logs
