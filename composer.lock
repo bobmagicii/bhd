@@ -1794,12 +1794,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/netherphp/atlantis.git",
-                "reference": "65fe2c5283628e79c21227e82c5a64e7d10d4c84"
+                "reference": "47d4029a5765c83b0ef64dbe7515ce14cab1d0fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netherphp/atlantis/zipball/65fe2c5283628e79c21227e82c5a64e7d10d4c84",
-                "reference": "65fe2c5283628e79c21227e82c5a64e7d10d4c84",
+                "url": "https://api.github.com/repos/netherphp/atlantis/zipball/47d4029a5765c83b0ef64dbe7515ce14cab1d0fd",
+                "reference": "47d4029a5765c83b0ef64dbe7515ce14cab1d0fd",
                 "shasum": ""
             },
             "require": {
@@ -1867,7 +1867,7 @@
                 "issues": "https://github.com/netherphp/atlantis/issues",
                 "source": "https://github.com/netherphp/atlantis/tree/master"
             },
-            "time": "2024-05-11T01:18:41+00:00"
+            "time": "2024-05-12T04:21:40+00:00"
         },
         {
             "name": "netherphp/avenue",
@@ -1990,12 +1990,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/netherphp/common.git",
-                "reference": "ce9fb2e5590d0a23b63d3d52aca5e5d14417fcbc"
+                "reference": "aa5dd17a03b13128691cf020477e75ba935c56c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netherphp/common/zipball/ce9fb2e5590d0a23b63d3d52aca5e5d14417fcbc",
-                "reference": "ce9fb2e5590d0a23b63d3d52aca5e5d14417fcbc",
+                "url": "https://api.github.com/repos/netherphp/common/zipball/aa5dd17a03b13128691cf020477e75ba935c56c2",
+                "reference": "aa5dd17a03b13128691cf020477e75ba935c56c2",
                 "shasum": ""
             },
             "require": {
@@ -2040,7 +2040,7 @@
                 "issues": "https://github.com/netherphp/common/issues",
                 "source": "https://github.com/netherphp/common/tree/master"
             },
-            "time": "2024-05-10T08:30:04+00:00"
+            "time": "2024-05-11T21:47:13+00:00"
         },
         {
             "name": "netherphp/console",
@@ -2048,12 +2048,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/netherphp/console.git",
-                "reference": "aade3261df35510d3ca36782aaae8a40782d545d"
+                "reference": "0c1675298147dd1b12969b8f6bac444bbc15c753"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netherphp/console/zipball/aade3261df35510d3ca36782aaae8a40782d545d",
-                "reference": "aade3261df35510d3ca36782aaae8a40782d545d",
+                "url": "https://api.github.com/repos/netherphp/console/zipball/0c1675298147dd1b12969b8f6bac444bbc15c753",
+                "reference": "0c1675298147dd1b12969b8f6bac444bbc15c753",
                 "shasum": ""
             },
             "require": {
@@ -2099,7 +2099,7 @@
                 "issues": "https://github.com/netherphp/console/issues",
                 "source": "https://github.com/netherphp/console/tree/redux"
             },
-            "time": "2024-05-10T06:59:02+00:00"
+            "time": "2024-05-12T05:20:05+00:00"
         },
         {
             "name": "netherphp/database",
