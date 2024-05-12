@@ -20,7 +20,7 @@ extends Common\Prototype {
 	GetBackupCommand(Project $Project, string $DestRoot):
 	string {
 
-		if(str_contains($this->Path, '@'))
+		if(str_contains($this->Path, ':'))
 		return $this->GetBackupCommandSSH($Project, $DestRoot);
 
 		return '';
