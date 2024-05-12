@@ -73,7 +73,6 @@ extends Atlantis\TerminalApp {
 			Common\Filesystem\Indexer::DatastoreFromPath($Dir)
 			->Filter(fn(string $F)=> str_ends_with($F, '.json'))
 			->Sort()
-			->Revalue()
 		);
 
 		////////
@@ -83,7 +82,12 @@ extends Atlantis\TerminalApp {
 
 		foreach($Files as $File) {
 			$Project = Local\Project::FromFile($File);
-			$Status[] = [ basename($Project->Filename), $Project->Type, $Project->DateLastRun ];
+
+			$Status[] = [
+				str_replace('.json', '', basename($Project->Filename)),
+				$Project->Type,
+				$Project->DateLastRun
+			];
 		}
 
 		$this->PrintTable(

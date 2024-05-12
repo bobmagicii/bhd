@@ -33,7 +33,9 @@ Add a new local or remote directory to copy over here.
 This is done via:
 
 * `rsync -azq --delete` meaning quietly archive, compress the network, and
-   delete files in the destination that have been removed from the source.
+   delete files in the destination that have been removed from the source. On
+   a snapshot that means nothing but on a living backup it means it is kept in
+   sync with the source.
 
 ## Repositories
 
