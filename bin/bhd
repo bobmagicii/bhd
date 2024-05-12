@@ -51,6 +51,49 @@ extends Atlantis\TerminalApp {
 		return 0;
 	}
 
+	#[Console\Meta\Command('list')]
+	#[Console\Meta\Info('List the configured projects.')]
+	public function
+	HandleProjectList():
+	int {
+
+		$Status = new Common\Datastore;
+		$Dir = NULL;
+		$Files = NULL;
+		$File = NULL;
+
+		////////
+
+		$Dir = Common\Filesystem\Util::Pathify(
+			$this->App->GetProjectRoot(),
+			'data', 'projects'
+		);
+
+		$Files = (
+			Common\Filesystem\Indexer::DatastoreFromPath($Dir)
+			->Filter(fn(string $F)=> str_ends_with($F, '.json'))
+			->Sort()
+			->Revalue()
+		);
+
+		////////
+
+		$this->PrintAppHeader('Projects');
+		$this->PrintStatus($Dir);
+
+		foreach($Files as $File) {
+			$Project = Local\Project::FromFile($File);
+			$Status[] = [ basename($Project->Filename), $Project->Type, $Project->DateLastRun ];
+		}
+
+		$this->PrintTable(
+			[ 'Project', 'Type', 'Last Run' ],
+			$Status->Export()
+		);
+
+		return 0;
+	}
+
 	#[Console\Meta\Command('dir')]
 	#[Console\Meta\Info('Add a local or remote directory to back up over here.')]
 	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
