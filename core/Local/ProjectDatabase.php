@@ -47,7 +47,7 @@ extends Common\Prototype {
 		if($this->TunnelHost)
 		$Cmd = sprintf(
 			'ssh %s "%s"',
-			$this->TunnelHost,
+			escapeshellarg($this->TunnelHost),
 			$Cmd
 		);
 
