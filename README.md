@@ -16,6 +16,14 @@ This was built to back up these scenarios offsite by pulling the resources from 
 * Checkout a git repository via `git`.
 * MySQL Backup via `mysqldump` optionally via SSH tunnel.
 
+## Requirements
+
+* PHP 8.1+
+* `rsync` for directory backup.
+* `git` for repository backup.
+* `ssh` for tunneled database backup.
+* `mysqldump` for db backup if not `ssh` tunneling to host with it.
+
 ## Projects
 
 Start a new backup project. This will create a JSON file named this so it is best to choose simple names as you're going to retype it a lot.
@@ -76,21 +84,13 @@ Perform all the actions configured for this project.
 
 
 
-# Requirements
-
-* PHP 8.1+
-* `rsync` for directory backup.
-* `git` for repository backup.
-* `ssh` for tunneled database backup.
-* `mysqldump` for db backup if not `ssh` tunneling to host with it.
-
-
-
 # Install
 
 * `$ git clone https://github.com/bobmagicii/bhd`
 * `$ cd bhd`
 * `$ composer install`
+
+
 
 # Command Help
 
