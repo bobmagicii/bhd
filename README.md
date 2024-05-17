@@ -92,6 +92,12 @@ Perform all the actions configured for this project.
 
 
 
+# Update
+
+* `$ git pull && composer install`
+
+
+
 # Command Help
 
 * `$ bhd` to list all commands.
@@ -112,7 +118,6 @@ Perform all the actions configured for this project.
 
 # Todo
 
-* This is sitting on top of my entire web stack so add a little self hosted
-  dashboard for management.
+* This is sitting on top of my entire web stack so add a little self hosted dashboard for management.
 
 
