@@ -176,6 +176,11 @@ implements
 	RunDirectories(string $DestRoot, Common\Date $When):
 	Common\Datastore {
 
+		if($this->Dirs->Count() === 0)
+		return new Common\Datastore;
+
+		////////
+
 		$Commands = new Common\Datastore;
 		$BackupRoot = $this->GetBackupRoot($DestRoot, $When, 'dirs');
 		Common\Filesystem\Util::MkDir($BackupRoot);
@@ -197,6 +202,11 @@ implements
 	RunRepos(string $DestRoot, Common\Date $When):
 	Common\Datastore {
 
+		if($this->Repos->Count() === 0)
+		return new Common\Datastore;
+
+		////////
+
 		$Commands = new Common\Datastore;
 		$BackupRoot = $this->GetBackupRoot($DestRoot, $When, 'repos');
 		Common\Filesystem\Util::MkDir($BackupRoot);
@@ -217,6 +227,11 @@ implements
 	protected function
 	RunDatabases(string $DestRoot, Common\Date $When):
 	Common\Datastore {
+
+		if($this->Databases->Count() === 0)
+		return new Common\Datastore;
+
+		////////
 
 		$Commands = new Common\Datastore;
 		$BackupRoot = $this->GetBackupRoot($DestRoot, $When, 'dbs');
