@@ -15,6 +15,36 @@ use Nether\Console;
 class App
 extends Atlantis\TerminalApp {
 
+	protected Local\ConfigFile
+	$Config;
+
+	protected function
+	OnReady():
+	void {
+
+		parent::OnReady();
+
+		$Filename = Common\Filesystem\Util::Pathify(
+			$this->App->GetProjectRoot(), 'data', 'bhd.json'
+		);
+
+		////////
+
+		if(!file_exists($Filename)) {
+			$this->Config = new Local\ConfigFile([ 'Filename'=> $Filename ]);
+			$this->Config->Write();
+		}
+
+		else {
+			$this->Config = Local\ConfigFile::FromFile($Filename);
+		}
+
+		return;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
 	#[Console\Meta\Command('new')]
 	#[Console\Meta\Info('Create a backup project.')]
 	#[Console\Meta\Arg('name', 'Name of the project to create.')]
@@ -68,6 +98,14 @@ extends Atlantis\TerminalApp {
 			$this->App->GetProjectRoot(),
 			'data', 'projects'
 		);
+
+		if(!file_exists($Dir))
+		Common\Filesystem\Util::MkDir($Dir);
+
+		if(!is_dir($Dir))
+		throw new Common\Error\DirNotFound($Dir);
+
+		////////
 
 		$Files = (
 			Common\Filesystem\Indexer::DatastoreFromPath($Dir)
@@ -278,6 +316,32 @@ extends Atlantis\TerminalApp {
 		return 0;
 	}
 
+	#[Console\Meta\Command('set')]
+	#[Console\Meta\Info('Set config options in bhd.conf.')]
+	#[Console\Meta\Value('--backup-root', 'The path to store the backups in. (default: NULL, meaning local data folder')]
+	public function
+	HandleSetConfig():
+	int {
+
+		$OptBackupRoot = $this->GetOption('backup-root');
+
+		////////
+
+		if($OptBackupRoot !== NULL) {
+			if(is_string($OptBackupRoot) && $OptBackupRoot !== '')
+			$this->Config->BackupRoot = $OptBackupRoot;
+
+			if($OptBackupRoot === TRUE || $OptBackupRoot === '')
+			$this->Config->BackupRoot = NULL;
+		}
+
+		////////
+
+		$this->Config->Write();
+
+		return 0;
+	}
+
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
 
@@ -296,11 +360,24 @@ extends Atlantis\TerminalApp {
 	GetPathToStorage(string $ProjectName):
 	string {
 
-		$Filename = $this->App->FromProjectRoot(Common\Filesystem\Util::Pathify(
+		if($this->Config->BackupRoot !== NULL) {
+			if(!file_exists($this->Config->BackupRoot))
+			Common\Filesystem\Util::MkDir($this->Config->BackupRoot);
+
+			if(!is_dir($this->Config->BackupRoot))
+			throw new Common\Error\DirNotFound($this->Config->BackupRoot);
+
+			return Common\Filesystem\Util::Pathify(
+				$this->Config->BackupRoot,
+				$ProjectName
+			);
+		}
+
+		////////
+
+		return $this->App->FromProjectRoot(Common\Filesystem\Util::Pathify(
 			'data', 'backups', $ProjectName
 		));
-
-		return $Filename;
 	}
 
 };
