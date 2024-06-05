@@ -282,11 +282,15 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Command('run')]
 	#[Console\Meta\Info('Perform project backup routine now.')]
 	#[Console\Meta\Arg('project', 'Name of the project to run.')]
+	#[Console\Meta\Error(1, 'commands reported errors')]
 	public function
 	HandleProjectRun():
 	int {
 
 		$Now = new Common\Date;
+		$RTimer = new Common\Timer;
+		$CTimer = new Common\Timer;
+		$TFrame = new Common\Units\Timeframe(0);
 		$Name = $this->GetInput(1);
 		$File = $this->GetPathToProject($Name);
 		$Dest = $this->GetPathToStorage($Name);
@@ -296,19 +300,64 @@ extends Atlantis\TerminalApp {
 		$CLI = NULL;
 		$Key = NULL;
 		$Cmd = NULL;
+		$Err = NULL;
+
+		////////
 
 		$this->PrintAppHeader(sprintf(
 			'Running Backup "%s"',
 			$Name
 		));
 
+		$RTimer->Start();
+
 		foreach($Commands as $Key => $Cmd) {
-			$this->PrintStatus("Running {$Key}...");
+			$this->PrintH2("Running {$Key}...");
 			$this->PrintLn($Cmd, 2);
+
+			$CTimer->Reset();
+			$CTimer->Start();
 
 			$CLI = new Console\Struct\CommandLineUtil($Cmd);
 			$CLI->Run();
+
+			$CTimer->Stop();
+			$TFrame->SetStop(max(1, $CTimer->Get()));
+
+			if($CLI->Error !== 0) {
+				$Err = TRUE;
+
+				$this->PrintLn();
+				$this->PrintStatusWarning(sprintf(
+					'Exit Code: %d (%s)', $CLI->Error, $TFrame
+				));
+
+				continue;
+			}
+
+			$this->PrintStatusMuted(sprintf(
+				'Done (%s, %s)', $Key, $TFrame
+			));
+
+			continue;
 		}
+
+		$RTimer->Stop();
+		$TFrame->SetStop(max(1, $RTimer->Get()));
+
+		////////
+
+		if($Err) {
+			$this->PrintError(sprintf(
+				'CHECK OUTPUT (%s, %s)', $Name, $TFrame
+			));
+
+			return 1;
+		}
+
+		$this->PrintOK(sprintf(
+			'Done (%s, %s)', $Name, $TFrame
+		));
 
 		$Project->UpdateLastRun($Now);
 		$Project->Write();
