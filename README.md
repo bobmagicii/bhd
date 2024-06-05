@@ -118,6 +118,10 @@ Perform all the actions configured for this project.
 
 # Todo
 
+* Option to sort the output of `list` by date.
+
+* Option to define how long is too long for a project to have not been backed up to light up the output of `list`.
+
+* Move database config to the Project JSON instead, because the `project.atl` stuff is bound by Nether\Database's support for a server type when that just is not needed to spit out CLI commands.
+
 * This is sitting on top of my entire web stack so add a little self hosted dashboard for management.
-
-
