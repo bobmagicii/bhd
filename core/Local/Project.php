@@ -191,6 +191,41 @@ implements
 	}
 
 	public function
+	GetTimeframeUntil():
+	Common\Units\Timeframe {
+
+		if($this->StaleAfter === 'never')
+		return new Common\Units\Timeframe('now', 'now');
+
+		if(!$this->DateLastRun)
+		return new Common\Units\Timeframe('now', 'now');
+
+		////////
+
+		$Last = Common\Date::FromDateString($this->DateLastRun, NULL, TRUE);
+		$When = $Last->Modify($this->StaleAfter);
+
+		$Time = new Common\Units\Timeframe('now', $When);
+		$Time->SetFormat($Time::FormatShorter);
+
+		////////
+
+		return $Time;
+	}
+
+	public function
+	GetDateLastRunShort():
+	string {
+
+		if(!$this->DateLastRun)
+		return '';
+
+		$Date = Common\Date::FromDateString($this->DateLastRun);
+
+		return $Date->Get(Common\Values::DateFormatYMDT24);
+	}
+
+	public function
 	HasRan():
 	bool {
 

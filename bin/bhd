@@ -88,7 +88,7 @@ extends Atlantis\TerminalApp {
 	HandleProjectList():
 	int {
 
-		$Headers = [ 'Project', 'Type', 'Last Run', 'Status' ];
+		$Headers = [ 'Project', 'Type', 'Last Run', 'Status', 'When' ];
 		$Status = new Common\Datastore;
 		$Styles = new Common\Datastore;
 		$Dir = NULL;
@@ -141,8 +141,9 @@ extends Atlantis\TerminalApp {
 			$Status[] = [
 				str_replace('.json', '', basename($Project->Filename)),
 				$Project->Type,
-				$Project->DateLastRun,
-				$Project->GetStatusWord()
+				$Project->GetDateLastRunShort(),
+				$Project->GetStatusWord(),
+				$Project->GetTimeframeUntil()->Get()
 			];
 
 			$Styles[] = match(TRUE) {
