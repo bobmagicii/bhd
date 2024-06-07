@@ -70,6 +70,10 @@ Perform all the actions configured for this project.
 
 * `$ bhd run example`
 
+Run all the projects which are due to be updated. This would be what you want to put in your crontab.
+
+* `$ bhd autorun`
+
 <details>
 	<summary>How It Works</summary>
 
