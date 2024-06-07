@@ -384,7 +384,7 @@ extends Atlantis\TerminalApp {
 
 	#[Console\Meta\Command('autorun')]
 	#[Console\Meta\Info('Backup all the projects that have gone stale by now.')]
-	#[Console\Meta\Command('--json', 'Print report as JSON.')]
+	#[Console\Meta\Toggle('--json', 'Print report as JSON.')]
 	public function
 	HandleProjectAutorun():
 	int {
