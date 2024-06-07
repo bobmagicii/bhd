@@ -62,16 +62,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.311.1",
+            "version": "3.311.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "90218b9372469babf294f97bdd764c9d47ec8a57"
+                "reference": "731cd73062909594c5f7443413c4c4c40ed1c25c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/90218b9372469babf294f97bdd764c9d47ec8a57",
-                "reference": "90218b9372469babf294f97bdd764c9d47ec8a57",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/731cd73062909594c5f7443413c4c4c40ed1c25c",
+                "reference": "731cd73062909594c5f7443413c4c4c40ed1c25c",
                 "shasum": ""
             },
             "require": {
@@ -151,9 +151,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.311.1"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.311.2"
             },
-            "time": "2024-06-06T18:05:50+00:00"
+            "time": "2024-06-07T18:05:33+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -2668,12 +2668,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/netherphp/atlantis.git",
-                "reference": "46ceda74796b99fd1aafb48e150b08f2334ee455"
+                "reference": "29e70b7f4dfdd101f28c9df060970de02141b6aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netherphp/atlantis/zipball/46ceda74796b99fd1aafb48e150b08f2334ee455",
-                "reference": "46ceda74796b99fd1aafb48e150b08f2334ee455",
+                "url": "https://api.github.com/repos/netherphp/atlantis/zipball/29e70b7f4dfdd101f28c9df060970de02141b6aa",
+                "reference": "29e70b7f4dfdd101f28c9df060970de02141b6aa",
                 "shasum": ""
             },
             "require": {
@@ -2741,7 +2741,7 @@
                 "issues": "https://github.com/netherphp/atlantis/issues",
                 "source": "https://github.com/netherphp/atlantis/tree/master"
             },
-            "time": "2024-06-07T02:03:32+00:00"
+            "time": "2024-06-07T19:55:23+00:00"
         },
         {
             "name": "netherphp/avenue",

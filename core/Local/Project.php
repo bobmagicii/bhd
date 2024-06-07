@@ -163,6 +163,16 @@ implements
 	////////////////////////////////////////////////////////////////
 
 	public function
+	GetName():
+	string {
+
+		$Name = basename($this->Filename);
+		$Name = str_replace('.json', '', $Name);
+
+		return $Name;
+	}
+
+	public function
 	GetStatus():
 	int {
 
