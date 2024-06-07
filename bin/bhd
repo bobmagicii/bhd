@@ -11,7 +11,7 @@ use Nether\Console;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#[Console\Meta\Application('BHD', '1.0.0')]
+#[Console\Meta\Application('BHD', '1.0.2')]
 class App
 extends Atlantis\TerminalApp {
 
@@ -83,14 +83,24 @@ extends Atlantis\TerminalApp {
 
 	#[Console\Meta\Command('list')]
 	#[Console\Meta\Info('List the configured projects.')]
+	#[Console\Meta\Toggle('--since', 'Sort by date last ran.')]
 	public function
 	HandleProjectList():
 	int {
 
+		$Headers = [ 'Project', 'Type', 'Last Run', 'Status' ];
 		$Status = new Common\Datastore;
+		$Styles = new Common\Datastore;
 		$Dir = NULL;
 		$Files = NULL;
-		$File = NULL;
+
+		$OptSort = match(TRUE) {
+			$this->GetOption('since')
+			=> 'since',
+
+			default
+			=> 'name'
+		};
 
 		////////
 
@@ -105,32 +115,52 @@ extends Atlantis\TerminalApp {
 		if(!is_dir($Dir))
 		throw new Common\Error\DirNotFound($Dir);
 
+		$this->PrintAppHeader('Projects');
+		$this->PrintStatus($Dir);
+
 		////////
 
 		$Files = (
 			Common\Filesystem\Indexer::DatastoreFromPath($Dir)
 			->Filter(fn(string $F)=> str_ends_with($F, '.json'))
-			->Sort()
+			->Remap(fn(string $F)=> Local\Project::FromFile($F))
 		);
 
 		////////
 
-		$this->PrintAppHeader('Projects');
-		$this->PrintStatus($Dir);
+		$Sorter = match($OptSort) {
+			'since' => Local\Project::SorterDateRun(...),
+			default => Local\Project::SorterFilename(...)
+		};
 
-		foreach($Files as $File) {
-			$Project = Local\Project::FromFile($File);
+		$Files->Sort($Sorter)->Revalue();
+
+		foreach($Files as $Project) {
+			/** @var Local\Project $Project */
 
 			$Status[] = [
 				str_replace('.json', '', basename($Project->Filename)),
 				$Project->Type,
-				$Project->DateLastRun
+				$Project->DateLastRun,
+				$Project->GetStatusWord()
 			];
+
+			$Styles[] = match(TRUE) {
+				!$Project->HasRan()
+				=> $this->Theme::Warning,
+
+				$Project->IsStale()
+				=> $this->Theme::Error,
+
+				default
+				=> $this->Theme::Default
+			};
 		}
 
 		$this->PrintTable(
-			[ 'Project', 'Type', 'Last Run' ],
-			$Status->Export()
+			Head:   $Headers,
+			Data:   $Status->Export(),
+			Styles: $Styles->Export()
 		);
 
 		return 0;

@@ -18,6 +18,11 @@ implements
 	////////////////////////////////////////////////////////////////
 
 	const
+	StatusNever = 0,
+	StatusOK    = 1,
+	StatusStale = 2;
+
+	const
 	TypeDateTime = 'datetime',
 	TypeSingle   = 'single';
 
@@ -45,6 +50,9 @@ implements
 	public ?string
 	$DateLastRun = NULL;
 
+	public ?string
+	$StaleAfter = '1 week';
+
 	#[Common\Meta\PropertyFactory('FromArray')]
 	public array|Common\Datastore
 	$Dirs = [];
@@ -66,6 +74,7 @@ implements
 
 		$Output = [
 			'DateLastRun' => $this->DateLastRun,
+			'StaleAfter'  => $this->StaleAfter,
 			'Type'        => $this->Type,
 			'Dirs'        => $this->Dirs->ToArray(),
 			'Repos'       => $this->Repos->ToArray(),
@@ -141,6 +150,62 @@ implements
 		);
 
 		return $this;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	public function
+	GetStatus():
+	int {
+
+		if(!$this->DateLastRun)
+		return static::StatusNever;
+
+		if($this->IsStale())
+		return static::StatusStale;
+
+		return static::StatusOK;
+	}
+
+	public function
+	GetStatusWord():
+	string {
+
+		return match($this->GetStatus()) {
+			static::StatusNever => 'Never',
+			static::StatusStale => 'Stale',
+			static::StatusOK    => 'OK',
+			default             => 'Unknown'
+		};
+	}
+
+	public function
+	GetTimeSince():
+	int {
+
+		$Now = Common\Date::Unixtime();
+		$Then = Common\Date::Unixtime($this->DateLastRun);
+
+		return $Now - $Then;
+	}
+
+	public function
+	HasRan():
+	bool {
+
+		return $this->DateLastRun !== NULL;
+	}
+
+	public function
+	IsStale():
+	bool {
+
+		$Now = Common\Date::Unixtime();
+		$Then = Common\Date::FromDateString($this->DateLastRun ?? '', NULL, TRUE);
+		$When = $Then->Modify($this->StaleAfter);
+
+		return $Now >= $When->GetUnixtime();
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -286,6 +351,23 @@ implements
 		$Output->Read();
 
 		return $Output;
+	}
+
+	static public function
+	SorterDateRun(self $A, self $B):
+	int {
+
+		if($A->DateLastRun !== $B->DateLastRun)
+		return $A->DateLastRun <=> $B->DateLastRun;
+
+		return static::SorterFilename($A, $B);
+	}
+
+	static public function
+	SorterFilename(self $A, self $B):
+	int {
+
+		return $A->Filename <=> $B->Filename;
 	}
 
 };
