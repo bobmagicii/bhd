@@ -62,6 +62,7 @@ Then add the database to the backup tool.
 
 * `$ bhd db <project> <alias>`
 * `$ bhd db example exampledb`
+* `$ bhd db example exampledb --tunnel=host`
 
 
 ## Running The Backup
