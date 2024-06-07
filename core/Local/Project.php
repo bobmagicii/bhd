@@ -23,6 +23,10 @@ implements
 	StatusStale = 2;
 
 	const
+	StaleNever = 'never',
+	StaleWeek  = '1 week';
+
+	const
 	TypeDateTime = 'datetime',
 	TypeSingle   = 'single';
 
@@ -51,7 +55,7 @@ implements
 	$DateLastRun = NULL;
 
 	public ?string
-	$StaleAfter = '1 week';
+	$StaleAfter = self::StaleWeek;
 
 	#[Common\Meta\PropertyFactory('FromArray')]
 	public array|Common\Datastore
@@ -114,6 +118,9 @@ implements
 		if(isset($Data['DateLastRun']))
 		$this->DateLastRun = $Data['DateLastRun'];
 
+		if(isset($Data['StaleAfter']))
+		$this->StaleAfter = $Data['StaleAfter'];
+
 		if(isset($Data['Dirs'])) {
 			($this->Dirs)
 			->Import($Data['Dirs'])
@@ -154,6 +161,16 @@ implements
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
+
+	public function
+	GetName():
+	string {
+
+		$Name = basename($this->Filename);
+		$Name = str_replace('.json', '', $Name);
+
+		return $Name;
+	}
 
 	public function
 	GetStatus():
@@ -235,6 +252,9 @@ implements
 	public function
 	IsStale():
 	bool {
+
+		if($this->StaleAfter === static::StaleNever)
+		return FALSE;
 
 		$Now = Common\Date::Unixtime();
 		$Then = Common\Date::FromDateString($this->DateLastRun ?? '', NULL, TRUE);
