@@ -16,7 +16,7 @@
 		"netherphp/common": "dev-master as 5.0.99"
 	},
 	"require-dev": {
-		"netherphp/standards": "^0.2.9",
+		"netherphp/standards": "dev-master",
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0"
 	},
 	"autoload": {

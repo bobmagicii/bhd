@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12f9a0b5ff2a2a9b50096d166eb0509c",
+    "content-hash": "adab91c7e01994d31d9dd12303f0cbdd",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -7040,22 +7040,23 @@
         },
         {
             "name": "netherphp/standards",
-            "version": "v0.2.9",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/netherphp/standards.git",
-                "reference": "4c872286ffe09b2ebdf7cb32cf168a9d2aa0b267"
+                "reference": "fe6159ea650aff4ded12bfbbbcefb277ed4cf827"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netherphp/standards/zipball/4c872286ffe09b2ebdf7cb32cf168a9d2aa0b267",
-                "reference": "4c872286ffe09b2ebdf7cb32cf168a9d2aa0b267",
+                "url": "https://api.github.com/repos/netherphp/standards/zipball/fe6159ea650aff4ded12bfbbbcefb277ed4cf827",
+                "reference": "fe6159ea650aff4ded12bfbbbcefb277ed4cf827",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.0",
                 "squizlabs/php_codesniffer": "^3.5"
             },
+            "default-branch": true,
             "bin": [
                 "bin/nethercs",
                 "bin/nethercbf"
@@ -7083,9 +7084,9 @@
             ],
             "support": {
                 "issues": "https://github.com/netherphp/standards/issues",
-                "source": "https://github.com/netherphp/standards/tree/v0.2.9"
+                "source": "https://github.com/netherphp/standards/tree/master"
             },
-            "time": "2023-01-29T06:49:16+00:00"
+            "time": "2024-04-13T20:47:22+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -7179,7 +7180,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "netherphp/atlantis": 20,
-        "netherphp/common": 20
+        "netherphp/common": 20,
+        "netherphp/standards": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
