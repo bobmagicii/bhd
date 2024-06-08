@@ -219,15 +219,16 @@ implements
 
 		////////
 
-		$Last = Common\Date::FromDateString($this->DateLastRun, NULL, TRUE);
-		$When = $Last->Modify($this->StaleAfter);
+		$Now = Common\Date::FromDateString('now', NULL, TRUE);
+		$Then = Common\Date::FromDateString($this->DateLastRun ?? '', NULL, TRUE);
+		$When = $Then->Modify($this->StaleAfter);
 
-		$Time = new Common\Units\Timeframe('now', $When);
-		$Time->SetFormat($Time::FormatShorter);
+		$Frame = new Common\Units\Timeframe($Now, $When);
+		$Frame->SetFormat($Frame::FormatShorter);
 
 		////////
 
-		return $Time;
+		return $Frame;
 	}
 
 	public function

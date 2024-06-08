@@ -2865,12 +2865,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/netherphp/common.git",
-                "reference": "e739db9f3b8a0a368a54483d06be0a206965e119"
+                "reference": "f3401e71f7a5a985f94ff9e5f0561ddf1b700caa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netherphp/common/zipball/e739db9f3b8a0a368a54483d06be0a206965e119",
-                "reference": "e739db9f3b8a0a368a54483d06be0a206965e119",
+                "url": "https://api.github.com/repos/netherphp/common/zipball/f3401e71f7a5a985f94ff9e5f0561ddf1b700caa",
+                "reference": "f3401e71f7a5a985f94ff9e5f0561ddf1b700caa",
                 "shasum": ""
             },
             "require": {
@@ -2915,7 +2915,7 @@
                 "issues": "https://github.com/netherphp/common/issues",
                 "source": "https://github.com/netherphp/common/tree/master"
             },
-            "time": "2024-06-07T20:34:17+00:00"
+            "time": "2024-06-08T00:15:13+00:00"
         },
         {
             "name": "netherphp/console",
