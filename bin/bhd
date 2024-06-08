@@ -11,7 +11,7 @@ use Nether\Console;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#[Console\Meta\Application('BHD', '1.0.3')]
+#[Console\Meta\Application('BHD', '1.0.4-dev')]
 class App
 extends Atlantis\TerminalApp {
 
@@ -128,9 +128,9 @@ extends Atlantis\TerminalApp {
 			$Status[] = [
 				str_replace('.json', '', basename($Project->Filename)),
 				$Project->Type,
-				$Project->GetDateLastRunShort(),
+				$Project->GetDateLastRunShort() ?: '-',
 				$Project->GetStatusWord(),
-				$Project->GetTimeframeUntil()->Get()
+				$Project->GetTimeframeUntil()->Get() ?: '-'
 			];
 
 			$Styles[] = match(TRUE) {
@@ -386,6 +386,7 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Command('autorun')]
 	#[Console\Meta\Info('Backup all the projects that have gone stale by now.')]
 	#[Console\Meta\Toggle('--json', 'Print report as JSON.')]
+	#[Console\Meta\Toggle('--quiet', 'No output.')]
 	public function
 	HandleProjectAutorun():
 	int {
@@ -399,19 +400,24 @@ extends Atlantis\TerminalApp {
 		$Report = NULL;
 
 		$OptJSON = $this->GetOption('json') ?? FALSE;
+		$OptQuiet = $this->GetOption('quiet') ?? FALSE;
 
 		////////
 
-		$Results = $Projects->Map(function(Local\Project $P): int {
+		$Results = $Projects->Map(function(Local\Project $P) use($OptQuiet): int {
 
 			if(!$P->IsStale())
 			return -1;
 
 			$Cmd = sprintf(
-				'php %s run %s',
+				'%s %s run %s',
+				escapeshellarg(PHP_BINARY),
 				escapeshellarg(__FILE__),
 				escapeshellarg($P->GetName())
 			);
+
+			if(!$OptQuiet)
+			$this->PrintLn($Cmd);
 
 			$CLI = new Console\Struct\CommandLineUtil($Cmd);
 			$CLI->Run();
@@ -432,11 +438,15 @@ extends Atlantis\TerminalApp {
 		];
 
 		if($OptJSON) {
+			if(!$OptQuiet)
 			$this->PrintLn(json_encode($Report));
+
 			return 0;
 		}
 
+		if(!$OptQuiet)
 		$this->PrintBulletList($Report);
+
 		return 0;
 	}
 
