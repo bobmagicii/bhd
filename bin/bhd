@@ -182,11 +182,7 @@ extends Atlantis\TerminalApp {
 
 		$Filename = $this->GetPathToProject($ProjectName);
 		$Project = $this->GetProject($Filename, 2);
-		$Exists = (
-			($Project->Dirs)
-			->Distill(fn(Local\ProjectDir $D)=> $D->Path === $Path)
-			->IsNotEmpty()
-		);
+		$Exists = $Project->HasDirPath($Path);
 
 		////////
 
@@ -237,11 +233,7 @@ extends Atlantis\TerminalApp {
 
 		$Filename = $this->GetPathToProject($ProjectName);
 		$Project = $this->GetProject($Filename, 2);
-		$Exists = (
-			($Project->Repos)
-			->Distill(fn(Local\ProjectRepo $D)=> $D->Path === $Path)
-			->IsNotEmpty()
-		);
+		$Exists = $Project->HasRepoPath($Path);
 
 		////////
 
@@ -297,11 +289,7 @@ extends Atlantis\TerminalApp {
 
 		$Filename = $this->GetPathToProject($ProjectName);
 		$Project = $this->GetProject($Filename, 2);
-		$Exists = (
-			($Project->Databases)
-			->Distill(fn(Local\ProjectDatabase $D)=> $D->Alias === $Alias)
-			->IsNotEmpty()
-		);
+		$Exists = $Project->HasDatabaseAlias($Alias);
 
 		////////
 
@@ -659,7 +647,7 @@ extends Atlantis\TerminalApp {
 	QueryUserForDBTunnel():
 	?string {
 
-		$Path = trim($this->PromptForValue('Tunnel via', 'string<domain>', TRUE));
+		$Path = trim($this->PromptForValue('Tunnel via', 'string<domain>', FALSE));
 
 		if(!$Path)
 		$Path = NULL;
