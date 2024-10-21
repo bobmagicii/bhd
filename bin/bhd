@@ -11,7 +11,7 @@ use Nether\Console;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#[Console\Meta\Application('BHD', '1.0.4-dev')]
+#[Console\Meta\Application('BHD', '1.0.5-dev', Phar: 'bhd.phar')]
 class App
 extends Atlantis\TerminalApp {
 
@@ -159,7 +159,8 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
 	#[Console\Meta\Arg('path', 'Path to backup')]
 	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
-	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	#[Console\Meta\Error(1, 'already exists: %s %s')]
+	#[Console\Meta\Error(2, 'project not found: %s')]
 	public function
 	HandleProjectDir():
 	int {
@@ -168,11 +169,19 @@ extends Atlantis\TerminalApp {
 		$Path = $this->GetInput(2);
 		$OptDelete = $this->GetOption('del');
 
-		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Filename = NULL;
+		$Project = NULL;
+		$Exists = NULL;
 
 		////////
 
+		if(!$ProjectName) {
+			$ProjectName = $this->QueryUserToSelectProject();
+			$Path = $this->QueryUserForPath();
+		}
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = $this->GetProject($Filename, 2);
 		$Exists = (
 			($Project->Dirs)
 			->Distill(fn(Local\ProjectDir $D)=> $D->Path === $Path)
@@ -480,6 +489,25 @@ extends Atlantis\TerminalApp {
 	////////////////////////////////////////////////////////////////
 
 	protected function
+	GetProject(string $Filename, int $ExitCode):
+	Local\Project {
+
+		$Output = NULL;
+		$Err = NULL;
+
+		////////
+
+		try { $Output = Local\Project::FromFile($Filename); }
+		catch(Common\Error\FileNotFound $Err) {
+			$this->Quit($ExitCode, $Err->Filename);
+		}
+
+		////////
+
+		return $Output;
+	}
+
+	protected function
 	GetPathToProject(string $ProjectName):
 	string {
 
@@ -543,6 +571,49 @@ extends Atlantis\TerminalApp {
 		);
 
 		return $Projects;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	protected function
+	QueryUserToSelectProject(?Common\Datastore $Projects=NULL):
+	string {
+
+		$PDir = $this->GetProjectDir();
+		$Projects = $this->FetchAllProjects($PDir);
+		$Prompt = NULL;
+		$Name = NULL;
+
+		////////
+
+		$this->PrintH2('Select Project...');
+		$this->PrintBulletList($Projects->Map(fn(Local\Project $P)=> $P->GetName()));
+
+		$Prompt = $this->PromptForValue('Project Name', 'string/int', TRUE);
+
+		////////
+
+		$Name = match(TRUE) {
+			(Common\Values::IsNumericDec($Prompt))
+			=> $Projects->Get( ((int)$Prompt) - 1 )->GetName(),
+
+			default
+			=> $Prompt
+		};
+
+		////////
+
+		return $Name;
+	}
+
+	protected function
+	QueryUserForPath():
+	string {
+
+		$Path = $this->PromptForValue('Directory', 'string<filepath>', TRUE);
+
+		return $Path;
 	}
 
 };
