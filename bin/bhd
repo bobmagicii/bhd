@@ -214,7 +214,8 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
 	#[Console\Meta\Arg('repo-url', 'Path to backup')]
 	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
-	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	#[Console\Meta\Error(1, 'already exists: %s %s')]
+	#[Console\Meta\Error(2, 'project not found: %s')]
 	public function
 	HandleProjectRepo():
 	int {
@@ -235,7 +236,7 @@ extends Atlantis\TerminalApp {
 		}
 
 		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Project = $this->GetProject($Filename, 2);
 		$Exists = (
 			($Project->Repos)
 			->Distill(fn(Local\ProjectRepo $D)=> $D->Path === $Path)
@@ -269,7 +270,8 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Arg('db', 'DB to backup.')]
 	#[Console\Meta\Value('--tunnel', 'Host to shell into first.')]
 	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
-	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	#[Console\Meta\Error(1, 'already exists: %s %s')]
+	#[Console\Meta\Error(2, 'project not found: %s')]
 	public function
 	HandleProjectDatabase():
 	int {
@@ -294,7 +296,7 @@ extends Atlantis\TerminalApp {
 		}
 
 		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Project = $this->GetProject($Filename, 2);
 		$Exists = (
 			($Project->Databases)
 			->Distill(fn(Local\ProjectDatabase $D)=> $D->Alias === $Alias)
