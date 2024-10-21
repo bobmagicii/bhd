@@ -173,6 +173,13 @@ implements
 	}
 
 	public function
+	GetType():
+	string {
+
+		return $this->Type;
+	}
+
+	public function
 	GetStatus():
 	int {
 

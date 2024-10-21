@@ -126,8 +126,8 @@ extends Atlantis\TerminalApp {
 			/** @var Local\Project $Project */
 
 			$Status[] = [
-				str_replace('.json', '', basename($Project->Filename)),
-				$Project->Type,
+				$Project->GetName(),
+				$Project->GetType(),
 				$Project->GetDateLastRunShort() ?: '-',
 				$Project->GetStatusWord(),
 				$Project->GetTimeframeUntil()->Get() ?: '-'
