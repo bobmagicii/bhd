@@ -223,11 +223,19 @@ extends Atlantis\TerminalApp {
 		$Path = $this->GetInput(2);
 		$OptDelete = $this->GetOption('del');
 
-		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Filename = NULL;
+		$Project = NULL;
+		$Exists = NULL;
 
 		////////
 
+		if(!$ProjectName) {
+			$ProjectName = $this->QueryUserToSelectProject();
+			$Path = $this->QueryUserForRepo();
+		}
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = Local\Project::FromFile($Filename);
 		$Exists = (
 			($Project->Repos)
 			->Distill(fn(Local\ProjectRepo $D)=> $D->Path === $Path)
@@ -271,11 +279,22 @@ extends Atlantis\TerminalApp {
 		$OptDelete = $this->GetOption('del');
 		$OptTunnelHost = $this->GetOption('tunnel');
 
-		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Filename = NULL;
+		$Project = NULL;
+		$Exists = NULL;
 
 		////////
 
+		if(!$ProjectName) {
+			$ProjectName = $this->QueryUserToSelectProject();
+			$Alias = $this->QueryUserForDBAlias();
+
+			if(!$OptDelete)
+			$OptTunnelHost = $this->QueryUserForDBTunnel();
+		}
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = Local\Project::FromFile($Filename);
 		$Exists = (
 			($Project->Databases)
 			->Distill(fn(Local\ProjectDatabase $D)=> $D->Alias === $Alias)
@@ -612,6 +631,36 @@ extends Atlantis\TerminalApp {
 	string {
 
 		$Path = $this->PromptForValue('Directory', 'string<filepath>', TRUE);
+
+		return $Path;
+	}
+
+	protected function
+	QueryUserForRepo():
+	string {
+
+		$Path = $this->PromptForValue('Git Repo URL', 'string<url>', TRUE);
+
+		return $Path;
+	}
+
+	protected function
+	QueryUserForDBAlias():
+	string {
+
+		$Path = $this->PromptForValue('Database Connection', 'string<alias>', TRUE);
+
+		return $Path;
+	}
+
+	protected function
+	QueryUserForDBTunnel():
+	?string {
+
+		$Path = trim($this->PromptForValue('Tunnel via', 'string<domain>', TRUE));
+
+		if(!$Path)
+		$Path = NULL;
 
 		return $Path;
 	}
