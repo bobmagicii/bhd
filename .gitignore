@@ -1,6 +1,7 @@
 # typical project wide annoyances.
 
 /.phpunit.cache
+/.vendex
 /**/.DS_Store
 
 /env.lock

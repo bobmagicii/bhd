@@ -3,6 +3,7 @@
 namespace Local;
 
 use Nether\Common;
+use Nether\Database;
 use Exception;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +137,30 @@ implements
 		if(isset($Data['Databases'])) {
 			($this->Databases)
 			->Import($Data['Databases'])
-			->Remap(fn(array $D)=> new ProjectDatabase($D));
+			->Remap(fn(array $D)=> new ProjectDatabase($D))
+			->Each(function(ProjectDatabase $D){
+
+				// port old config to new config.
+
+				if(isset($D->Type) && isset($D->Hostname))
+				return;
+
+				$DM = new Database\Manager;
+				$DB = $DM->Get($D->Alias);
+
+				if(!$DB)
+				return;
+
+				$D->Type = $DB->Type;
+				$D->Database = $DB->Database;
+				$D->Hostname = $DB->Hostname;
+				$D->Username = $DB->Username;
+				$D->Password = $DB->Password;
+				$D->Charset = $DB->Charset;
+				$this->Write();
+
+				return;
+			});
 		}
 
 		////////

@@ -53,16 +53,14 @@ Add a new git repository to clone over here.
 
 ## Databases
 
-Add a new database to back up over here. First configure the database connection. Note that if intending to use an SSH tunnel the host you specify to `project.atl` may be something like `localhost` rather than the FQDN.
+Add a new database to back up over here.
 
-* `$ project.atl db ...`
-* `$ project.atl db --set=exampledb --type=mysql --host=example.tld --user=exuser --pass=expass --db=exdbname`
+* `$ bhd db <project> --db=... --tunnel=... --host=... --user=... --pass=...`
+* `$ bhd db example --db=ExampleDB --tunnel=example.tld --user=exuser --pass=expass`
 
-Then add the database to the backup tool.
+And then to remove it from the config.
 
-* `$ bhd db <project> <alias>`
-* `$ bhd db example exampledb`
-* `$ bhd db example exampledb --tunnel=host`
+* `$ bhd db example --del --db=ExampleDB`
 
 
 ## Running The Backup

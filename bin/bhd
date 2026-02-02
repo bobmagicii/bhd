@@ -94,6 +94,8 @@ extends Atlantis\TerminalApp {
 		$Dir = NULL;
 		$Files = NULL;
 
+		$OptDiskUse = $this->GetOption('du');
+
 		$OptSort = match(TRUE) {
 			$this->GetOption('since')
 			=> 'since',
@@ -122,16 +124,24 @@ extends Atlantis\TerminalApp {
 
 		$Files->Sort($Sorter)->Revalue();
 
+		if($OptDiskUse)
+		$Headers[] = 'Disk Use';
+
 		foreach($Files as $Project) {
 			/** @var Local\Project $Project */
 
-			$Status[] = [
+			$Row = [
 				str_replace('.json', '', basename($Project->Filename)),
 				$Project->Type,
 				$Project->GetDateLastRunShort() ?: '-',
 				$Project->GetStatusWord(),
 				$Project->GetTimeframeUntil()->Get() ?: '-'
 			];
+
+			if($OptDiskUse)
+			$Row[] = '?';
+
+			$Status[] = $Row;
 
 			$Styles[] = match(TRUE) {
 				!$Project->HasRan()
@@ -249,46 +259,67 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Command('db')]
 	#[Console\Meta\Info('Add a project.atl configured DB to backup over here.')]
 	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
-	#[Console\Meta\Arg('db', 'DB to backup.')]
-	#[Console\Meta\Value('--tunnel', 'Host to shell into first.')]
 	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
+	#[Console\Meta\Value('--tunnel', 'Host to shell into first.')]
+	#[Console\Meta\Value('--type', 'Database type (default: mysql)')]
+	#[Console\Meta\Value('--db', 'Database name.')]
+	#[Console\Meta\Value('--host', 'Database host (default: localhost)')]
+	#[Console\Meta\Value('--tunnel', 'Host to tunnel via SSH first.')]
+	#[Console\Meta\Value('--user', 'Database username.')]
+	#[Console\Meta\Value('--pass', 'Database password.')]
+	#[Console\Meta\Value('--charset', 'Database charset (default: utf8mb4).')]
 	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	#[Console\Meta\Error(2, 'No --db specified.')]
 	public function
 	HandleProjectDatabase():
 	int {
 
 		$ProjectName = $this->GetInput(1);
-		$Alias = $this->GetInput(2);
 		$OptDelete = $this->GetOption('del');
-		$OptTunnelHost = $this->GetOption('tunnel');
+
+		$DBName = $this->GetOption('db') ?: NULL;
+		$DBUser = $this->GetOption('user') ?: NULL;
+		$DBPass = $this->GetOption('pass') ?: NULL;
+		$TNHost = $this->GetOption('tunnel') ?: NULL;
+		$DBHost = $this->GetOption('host') ?: 'localhost';
+		$DBType = $this->GetOption('type') ?: 'mysql';
+		$DBCharset = $this->GetOption('charset') ?: 'utf8mb4';
 
 		$Filename = $this->GetPathToProject($ProjectName);
 		$Project = Local\Project::FromFile($Filename);
+
+		if(!$DBName)
+		$this->Quit(2);
 
 		////////
 
 		$Exists = (
 			($Project->Databases)
-			->Distill(fn(Local\ProjectDatabase $D)=> $D->Alias === $Alias)
+			->Distill(fn(Local\ProjectDatabase $D)=> $D->Database === $DBName)
 			->IsNotEmpty()
 		);
 
 		////////
 
 		if($OptDelete) {
-			$this->PrintStatus("Removing {$Alias} from {$ProjectName}");
+			$this->PrintStatus("Removing {$DBName} from {$ProjectName}");
 
 			if($Exists)
-			$Project->Databases->Filter(fn(Local\ProjectDatabase $D)=> $D->Alias !== $Alias);
+			$Project->Databases->Filter(fn(Local\ProjectDatabase $D)=> $D->Database !== $DBName);
 		}
 
 		else {
-			$this->PrintStatus("Adding {$Alias} to {$ProjectName}");
+			$this->PrintStatus("Adding {$DBName} to {$ProjectName}");
 
 			if(!$Exists)
 			$Project->Databases->Push(Local\ProjectDatabase::New(
-				Alias: $Alias,
-				TunnelHost: $OptTunnelHost
+				Type:       $DBType,
+				TunnelHost: $TNHost,
+				Database:   $DBName,
+				Hostname:   $DBHost,
+				Username:   $DBUser,
+				Password:   $DBPass,
+				Charset:    $DBCharset
 			));
 		}
 

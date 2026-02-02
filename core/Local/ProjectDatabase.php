@@ -11,11 +11,26 @@ use Nether\Database;
 class ProjectDatabase
 extends Common\Prototype {
 
-	public string
-	$Alias;
+	public ?string
+	$Type = NULL;
 
 	public ?string
 	$TunnelHost = NULL;
+
+	public ?string
+	$Hostname = NULL;
+
+	public ?string
+	$Database = NULL;
+
+	public ?string
+	$Username = NULL;
+
+	public ?string
+	$Password = NULL;
+
+	public ?string
+	$Charset = NULL;
 
 	////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////
@@ -24,22 +39,20 @@ extends Common\Prototype {
 	GetBackupCommand(Project $Project, string $DestRoot):
 	string {
 
-		$DM = new Database\Manager;
-		$DB = $DM->Get($this->Alias);
-
 		$Outfile = Common\Filesystem\Util::Pathify(
 			$DestRoot,
-			"{$DB->Name}.sql"
+			"{$this->Database}.{$this->Type}.sql"
 		);
 
 		////////
 
 		$Cmd = sprintf(
-			'mysqldump %s %s %s %s',
-			escapeshellarg("-h{$DB->Hostname}"),
-			escapeshellarg("-u{$DB->Username}"),
-			escapeshellarg("-p{$DB->Password}"),
-			escapeshellarg($DB->Database)
+			'mysqldump %s %s %s %s %s',
+			escapeshellarg("-h{$this->Hostname}"),
+			escapeshellarg("-u{$this->Username}"),
+			escapeshellarg("-p{$this->Password}"),
+			escapeshellarg($this->Database),
+			sprintf('--ignore-table="%s.%s"', $this->Database, 'TrafficRows')
 		);
 
 		// tunnel it through ssh if needed.
@@ -65,12 +78,17 @@ extends Common\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	static public function
-	New(string $Alias, ?string $TunnelHost=NULL):
+	New(	?string $TunnelHost=NULL, ?string $Type=NULL, ?string $Database=NULL, ?string $Hostname=NULL, ?string $Username=NULL, ?string $Password=NULL, ?string $Charset=NULL):
 	static {
 
 		$Output = new static([
-			'Alias'      => $Alias,
-			'TunnelHost' => $TunnelHost
+			'Type'       => $Type,
+			'TunnelHost' => $TunnelHost,
+			'Hostname'   => $Hostname,
+			'Database'   => $Database,
+			'Username'   => $Username,
+			'Password'   => $Password,
+			'Charset'    => $Charset
 		]);
 
 		return $Output;
