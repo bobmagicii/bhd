@@ -11,7 +11,7 @@ use Nether\Console;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#[Console\Meta\Application('BHD', '1.0.4-dev')]
+#[Console\Meta\Application('BHD', '1.0.5-dev', Phar: 'bhd.phar')]
 class App
 extends Atlantis\TerminalApp {
 
@@ -131,8 +131,8 @@ extends Atlantis\TerminalApp {
 			/** @var Local\Project $Project */
 
 			$Row = [
-				str_replace('.json', '', basename($Project->Filename)),
-				$Project->Type,
+				$Project->GetName(),
+				$Project->GetType(),
 				$Project->GetDateLastRunShort() ?: '-',
 				$Project->GetStatusWord(),
 				$Project->GetTimeframeUntil()->Get() ?: '-'
@@ -155,10 +155,11 @@ extends Atlantis\TerminalApp {
 			};
 		}
 
-		$this->PrintTable(
-			Head:   $Headers,
-			Data:   $Status->Export(),
-			Styles: $Styles->Export()
+		Console\Elements\Table::New(
+			Client: $this,
+			Headers: $Headers,
+			Rows: $Status->Export(),
+			Print: 2
 		);
 
 		return 0;
@@ -169,7 +170,8 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
 	#[Console\Meta\Arg('path', 'Path to backup')]
 	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
-	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	#[Console\Meta\Error(1, 'already exists: %s %s')]
+	#[Console\Meta\Error(2, 'project not found: %s')]
 	public function
 	HandleProjectDir():
 	int {
@@ -178,16 +180,20 @@ extends Atlantis\TerminalApp {
 		$Path = $this->GetInput(2);
 		$OptDelete = $this->GetOption('del');
 
-		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Filename = NULL;
+		$Project = NULL;
+		$Exists = NULL;
 
 		////////
 
-		$Exists = (
-			($Project->Dirs)
-			->Distill(fn(Local\ProjectDir $D)=> $D->Path === $Path)
-			->IsNotEmpty()
-		);
+		if(!$ProjectName) {
+			$ProjectName = $this->QueryUserToSelectProject();
+			$Path = $this->QueryUserForPath();
+		}
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = $this->GetProject($Filename, 2);
+		$Exists = $Project->HasDirPath($Path);
 
 		////////
 
@@ -215,7 +221,8 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Arg('project', 'Name of the project to edit.')]
 	#[Console\Meta\Arg('repo-url', 'Path to backup')]
 	#[Console\Meta\Toggle('--del', 'Remove from project instead.')]
-	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
+	#[Console\Meta\Error(1, 'already exists: %s %s')]
+	#[Console\Meta\Error(2, 'project not found: %s')]
 	public function
 	HandleProjectRepo():
 	int {
@@ -224,16 +231,20 @@ extends Atlantis\TerminalApp {
 		$Path = $this->GetInput(2);
 		$OptDelete = $this->GetOption('del');
 
-		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Filename = NULL;
+		$Project = NULL;
+		$Exists = NULL;
 
 		////////
 
-		$Exists = (
-			($Project->Repos)
-			->Distill(fn(Local\ProjectRepo $D)=> $D->Path === $Path)
-			->IsNotEmpty()
-		);
+		if(!$ProjectName) {
+			$ProjectName = $this->QueryUserToSelectProject();
+			$Path = $this->QueryUserForRepo();
+		}
+
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = $this->GetProject($Filename, 2);
+		$Exists = $Project->HasRepoPath($Path);
 
 		////////
 
@@ -268,8 +279,8 @@ extends Atlantis\TerminalApp {
 	#[Console\Meta\Value('--user', 'Database username.')]
 	#[Console\Meta\Value('--pass', 'Database password.')]
 	#[Console\Meta\Value('--charset', 'Database charset (default: utf8mb4).')]
-	#[Console\Meta\Error(1, 'Already Exists: %s %s')]
-	#[Console\Meta\Error(2, 'No --db specified.')]
+	#[Console\Meta\Error(1, 'already exists: %s %s')]
+	#[Console\Meta\Error(2, 'project not found: %s')]
 	public function
 	HandleProjectDatabase():
 	int {
@@ -285,19 +296,18 @@ extends Atlantis\TerminalApp {
 		$DBType = $this->GetOption('type') ?: 'mysql';
 		$DBCharset = $this->GetOption('charset') ?: 'utf8mb4';
 
-		$Filename = $this->GetPathToProject($ProjectName);
-		$Project = Local\Project::FromFile($Filename);
+		$Filename = NULL;
+		$Project = NULL;
+		$Exists = NULL;
 
 		if(!$DBName)
-		$this->Quit(2);
+		$this->Quit(3);
 
 		////////
 
-		$Exists = (
-			($Project->Databases)
-			->Distill(fn(Local\ProjectDatabase $D)=> $D->Database === $DBName)
-			->IsNotEmpty()
-		);
+		$Filename = $this->GetPathToProject($ProjectName);
+		$Project = $this->GetProject($Filename, 2);
+		$Exists = $Project->HasDatabaseAlias($DBName);
 
 		////////
 
@@ -511,6 +521,25 @@ extends Atlantis\TerminalApp {
 	////////////////////////////////////////////////////////////////
 
 	protected function
+	GetProject(string $Filename, int $ExitCode):
+	Local\Project {
+
+		$Output = NULL;
+		$Err = NULL;
+
+		////////
+
+		try { $Output = Local\Project::FromFile($Filename); }
+		catch(Common\Error\FileNotFound $Err) {
+			$this->Quit($ExitCode, $Err->Filename);
+		}
+
+		////////
+
+		return $Output;
+	}
+
+	protected function
 	GetPathToProject(string $ProjectName):
 	string {
 
@@ -574,6 +603,79 @@ extends Atlantis\TerminalApp {
 		);
 
 		return $Projects;
+	}
+
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+	protected function
+	QueryUserToSelectProject(?Common\Datastore $Projects=NULL):
+	string {
+
+		$PDir = $this->GetProjectDir();
+		$Projects = $this->FetchAllProjects($PDir);
+		$Prompt = NULL;
+		$Name = NULL;
+
+		////////
+
+		$this->PrintH2('Select Project...');
+		$this->PrintBulletList($Projects->Map(fn(Local\Project $P)=> $P->GetName()));
+
+		$Prompt = $this->PromptForValue('Project Name', 'string/int', TRUE);
+
+		////////
+
+		$Name = match(TRUE) {
+			(Common\Values::IsNumericDec($Prompt))
+			=> $Projects->Get( ((int)$Prompt) - 1 )->GetName(),
+
+			default
+			=> $Prompt
+		};
+
+		////////
+
+		return $Name;
+	}
+
+	protected function
+	QueryUserForPath():
+	string {
+
+		$Path = $this->PromptForValue('Directory', 'string<filepath>', TRUE);
+
+		return $Path;
+	}
+
+	protected function
+	QueryUserForRepo():
+	string {
+
+		$Path = $this->PromptForValue('Git Repo URL', 'string<url>', TRUE);
+
+		return $Path;
+	}
+
+	protected function
+	QueryUserForDBAlias():
+	string {
+
+		$Path = $this->PromptForValue('Database Connection', 'string<alias>', TRUE);
+
+		return $Path;
+	}
+
+	protected function
+	QueryUserForDBTunnel():
+	?string {
+
+		$Path = trim($this->PromptForValue('Tunnel via', 'string<domain>', FALSE));
+
+		if(!$Path)
+		$Path = NULL;
+
+		return $Path;
 	}
 
 };

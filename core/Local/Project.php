@@ -197,6 +197,13 @@ implements
 	}
 
 	public function
+	GetType():
+	string {
+
+		return $this->Type;
+	}
+
+	public function
 	GetStatus():
 	int {
 
@@ -286,6 +293,39 @@ implements
 		$When = $Then->Modify($this->StaleAfter);
 
 		return $Now >= $When->GetUnixtime();
+	}
+
+	public function
+	HasDirPath(string $Path):
+	bool {
+
+		return (
+			($this->Dirs)
+			->Distill(fn(ProjectDir $D)=> $D->Path === $Path)
+			->IsNotEmpty()
+		);
+	}
+
+	public function
+	HasRepoPath(string $Path):
+	bool {
+
+		return (
+			($this->Repos)
+			->Distill(fn(ProjectRepo $D)=> $D->Path === $Path)
+			->IsNotEmpty()
+		);
+	}
+
+	public function
+	HasDatabaseAlias(string $DBName):
+	bool {
+
+		return (
+			($this->Databases)
+			->Distill(fn(ProjectDatabase $D)=> $D->Database === $DBName)
+			->IsNotEmpty()
+		);
 	}
 
 	////////////////////////////////////////////////////////////////

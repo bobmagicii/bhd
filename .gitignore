@@ -3,6 +3,7 @@
 /.phpunit.cache
 /.vendex
 /**/.DS_Store
+/**/Thumbs.db
 
 /env.lock
 /logs
