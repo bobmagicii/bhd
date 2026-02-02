@@ -160,6 +160,7 @@ extends Atlantis\TerminalApp {
 			Headers: $Headers,
 			Rows: $Status->Export(),
 			Styles: $Styles,
+			BorderColour: Nether\Dye\Colour::From('#888888'),
 			Print: 2
 		);
 
