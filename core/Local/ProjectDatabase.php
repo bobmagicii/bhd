@@ -52,7 +52,7 @@ extends Common\Prototype {
 			escapeshellarg("-u{$this->Username}"),
 			escapeshellarg("-p{$this->Password}"),
 			escapeshellarg($this->Database),
-			sprintf('--ignore-table="%s.%s"', $this->Database, 'TrafficRows')
+			sprintf('--ignore-table=\'%s.%s\'', $this->Database, 'TrafficRows')
 		);
 
 		// tunnel it through ssh if needed.

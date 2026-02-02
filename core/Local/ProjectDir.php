@@ -20,8 +20,14 @@ extends Common\Prototype {
 	GetBackupCommand(Project $Project, string $DestRoot):
 	string {
 
+		// the -a argument seems to cause issues on mac
+		// due to its inclusion of p, g, and o, causing
+		// infinite hangs of getting nothing done at random
+		// times.
+
 		return sprintf(
-			'rsync -azq --delete %s %s',
+			//'rsync -azq --delete %s %s',
+			'rsync -rltDzq --delete %s %s',
 			escapeshellarg($this->Path),
 			escapeshellarg($DestRoot)
 		);
