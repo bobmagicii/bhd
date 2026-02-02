@@ -145,13 +145,13 @@ extends Atlantis\TerminalApp {
 
 			$Styles[] = match(TRUE) {
 				!$Project->HasRan()
-				=> $this->Theme::Warning,
+				=> '#cccc33',
 
 				$Project->IsStale()
-				=> $this->Theme::Error,
+				=> '#cc3333',
 
 				default
-				=> $this->Theme::Default
+				=> NULL
 			};
 		}
 
@@ -159,6 +159,7 @@ extends Atlantis\TerminalApp {
 			Client: $this,
 			Headers: $Headers,
 			Rows: $Status->Export(),
+			Styles: $Styles,
 			Print: 2
 		);
 

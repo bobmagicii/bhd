@@ -2000,12 +2000,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/netherphp/console.git",
-                "reference": "9d9a8afb2f5181ebdcd25931e0c4fbea1002aaf9"
+                "reference": "81ab6e561e01a54f3def286f34d33946ac2cab3d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netherphp/console/zipball/9d9a8afb2f5181ebdcd25931e0c4fbea1002aaf9",
-                "reference": "9d9a8afb2f5181ebdcd25931e0c4fbea1002aaf9",
+                "url": "https://api.github.com/repos/netherphp/console/zipball/81ab6e561e01a54f3def286f34d33946ac2cab3d",
+                "reference": "81ab6e561e01a54f3def286f34d33946ac2cab3d",
                 "shasum": ""
             },
             "require": {
@@ -2051,7 +2051,7 @@
                 "issues": "https://github.com/netherphp/console/issues",
                 "source": "https://github.com/netherphp/console/tree/redux"
             },
-            "time": "2025-11-09T00:49:00+00:00"
+            "time": "2026-02-02T04:18:40+00:00"
         },
         {
             "name": "netherphp/database",
