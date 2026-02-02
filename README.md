@@ -122,6 +122,4 @@ expecting you have magic key entry configured from here to there.
 
 ## Todo
 
-* Move database config to the Project JSON instead, because the `project.atl` stuff is bound by Nether\Database's support for a server type when that just is not needed to spit out CLI commands.
-
 * This is sitting on top of my entire web stack so add a little self hosted dashboard for management.
