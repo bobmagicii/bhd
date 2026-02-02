@@ -1,8 +1,18 @@
 #!env php
 <?php
 
-define('AppRoot', dirname(__FILE__, 2));
-require(sprintf('%s/vendor/autoload.php', AppRoot));
+require(sprintf(
+	'%s/vendor/autoload.php',
+	dirname(__FILE__, 2)
+));
+
+$AppRoot = match(TRUE) {
+	(Phar::Running() !== '')
+	=> dirname(Phar::Running(FALSE), 1),
+
+	default
+	=> dirname(__FILE__, 2)
+};
 
 use Nether\Atlantis;
 use Nether\Common;
@@ -680,9 +690,42 @@ extends Atlantis\TerminalApp {
 		return $Path;
 	}
 
+	////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+
+
+	protected function
+	GetPharFiles():
+	Common\Datastore {
+
+		$Index = parent::GetPharFiles();
+
+		$Index->Push('core');
+
+		return $Index;
+	}
+
+	protected function
+	GetPharFileFilters():
+	Common\Datastore {
+
+		$Output = parent::GetPharFileFilters();
+
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/monolog'));
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/dealerdirect'));
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/fileeye'));
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/squizlabs'));
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/fileeye'));
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/psr'));
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/aws'));
+		$Output->Push(fn(string $Path)=> !str_starts_with($Path, 'vendor/google'));
+
+		return $Output;
+	}
+
 };
 
 exit(App::Realboot([
-	'AppRoot' => AppRoot
+	'AppRoot' => $AppRoot
 ]));
 
