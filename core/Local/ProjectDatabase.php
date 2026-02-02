@@ -78,7 +78,7 @@ extends Common\Prototype {
 	////////////////////////////////////////////////////////////////
 
 	static public function
-	New(	?string $TunnelHost=NULL, ?string $Type=NULL, ?string $Database=NULL, ?string $Hostname=NULL, ?string $Username=NULL, ?string $Password=NULL, ?string $Charset=NULL):
+	New(?string $TunnelHost=NULL, ?string $Type=NULL, ?string $Database=NULL, ?string $Hostname=NULL, ?string $Username=NULL, ?string $Password=NULL, ?string $Charset=NULL):
 	static {
 
 		$Output = new static([
